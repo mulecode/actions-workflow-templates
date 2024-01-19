@@ -1,0 +1,48 @@
+name: Docker Versioning
+
+on:
+  workflow_call:
+    inputs:
+      dockerRegistry:
+        description: "Docker registry"
+        type: string
+        default: ghcr.io
+      dockerNewTag:
+        description: "Docker new tag"
+        type: string
+        required: true
+      dockerImage:
+        description: "Current docker image name"
+        type: string
+        required: true
+      dockerTag:
+        description: "Current docker image tag"
+        type: string
+        required: true
+    secrets:
+      dockerUsername:
+        description: "Docker username to login to docker registry"
+        required: true
+      dockerPassword:
+        description: "Docker password to login to docker registry"
+        required: true
+
+jobs:
+  docker_tag:
+    name: Docker Tag
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Docker Login
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ inputs.dockerRegistry }}
+          username: ${{ secrets.dockerUsername }}
+          password: ${{ secrets.dockerPassword }}
+      - name: Tag docker images with version
+        run: |
+          echo "Tagging docker image ${{ inputs.dockerImage }}:${{ inputs.dockerTag}}" with ${{ inputs.dockerNewTag }}
+          docker pull ${{ inputs.dockerImage }}:${{ inputs.dockerTag }}
+          docker tag ${{ inputs.dockerImage }}:${{ inputs.dockerTag }} ${{ inputs.dockerImage }}:${{ inputs.dockerNewTag }}
+          docker push ${{ inputs.dockerImage }}:${{ inputs.dockerNewTag }}

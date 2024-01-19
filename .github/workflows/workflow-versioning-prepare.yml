@@ -1,0 +1,35 @@
+name: Prepare Versioning
+
+on:
+  workflow_call:
+    inputs:
+      configFilePath:
+        description: "Vertere config file path"
+        type: string
+        default: vertere.yml
+    outputs:
+      nextVersion:
+        description: "The next semantic version calculated by vertere"
+        value: ${{ jobs.prepare_versioning.outputs.nextVersion }}
+
+jobs:
+  prepare_versioning:
+    name: Prepare Versioning
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # Fetch all history, including tags so vertere can find the latest tag
+          fetch-depth: 0
+      - name: Install vertere
+        run: |
+          pip3 install GitPython==3.1.41 PyYAML==6.0.1 click==8.1.7 vertere==1.1.0
+      - name: Versioning preparation
+        run: |
+          vertere init --config-path ${{ inputs.configFilePath }}
+      - name: Reading tag from file
+        id: read_tag
+        run: echo "TAG=$(cat .vertere_out.txt)" >> $GITHUB_OUTPUT
+    outputs:
+      nextVersion: ${{ steps.read_tag.outputs.TAG }}
