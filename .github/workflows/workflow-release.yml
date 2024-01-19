@@ -1,0 +1,52 @@
+name: Prepare Versioning
+
+on:
+  workflow_call:
+    inputs:
+      changelogPath:
+        description: "changelog config file path"
+        type: string
+        default: CHANGELOG.md
+      nextVersion:
+        description: "Semantic version to be released"
+        type: string
+        required: true
+    secrets:
+      githubToken:
+        description: "Token to checkout the code"
+        required: true
+
+jobs:
+  release:
+    name: Release version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set Next Version
+        run: |
+          echo "Next version is ${{ inputs.nextVersion }}"
+      - name: Push Git Tag latest
+        run: |
+          echo "Git tagging latest"
+          git config user.name "GitHub Actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git tag latest
+          git push origin latest
+      - name: Push Git Tag version
+        run: |
+          echo "Git tagging ${{ inputs.nextVersion }}"
+          git config user.name "GitHub Actions"
+          git config user.email "github-actions@users.noreply.github.com"
+          git tag ${{ inputs.nextVersion }}
+          git push origin ${{ inputs.nextVersion }}
+      - name: Create a GitHub release
+        env:
+          GITHUB_TOKEN: ${{ secrets.githubToken }}
+          tag: ${{ inputs.nextVersion }}
+        run: |
+          echo "Creating release ${{ inputs.nextVersion }}"
+          gh release create "$tag" \
+            --title="${tag}" \
+            --notes-file <(awk '/---/{if(found) exit; next} {print; found=1}' ${{ inputs.changelogPath }})
+
