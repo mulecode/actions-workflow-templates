@@ -1,0 +1,41 @@
+name: Terraform Test
+
+on:
+  workflow_call:
+    inputs:
+      modulePath:
+        description: "Module path to run terraform commands"
+        type: string
+        default: ./
+      awsRole:
+        description: "The role to assume for the deployment"
+        required: true
+        type: string
+      awsRegion:
+        description: "The region for the deployment"
+        required: true
+        type: string
+      awsSessionName:
+        description: "The session name for the deployment"
+        required: true
+        type: string
+
+jobs:
+  terraform_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4.0.2
+        with:
+          role-to-assume: ${{ inputs.awsRole }}
+          role-session-name: ${{ inputs.awsSessionName }}
+          aws-region: ${{ inputs.awsRegion }}
+      - name: Terraform Format
+        run: make -C ${{ inputs.modulePath }} format
+      - name: Terraform Init
+        run: make -C ${{ inputs.modulePath }} init
+      - name: Terraform Validate
+        run: make -C ${{ inputs.modulePath }} validate
+      - name: Terraform Plan
+        run: make -C ${{ inputs.modulePath }} plan
