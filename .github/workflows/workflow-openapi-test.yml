@@ -1,0 +1,17 @@
+name: OpenAPI Test
+
+on:
+  workflow_call:
+    inputs:
+      modulePath:
+        description: "Module path to run test commends"
+        type: string
+        default: ./
+
+jobs:
+  openapi_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lint OpenAPI files
+        run: make -C ${{ inputs.modulePath }} lint
