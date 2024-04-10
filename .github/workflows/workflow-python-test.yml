@@ -1,0 +1,21 @@
+name: Python Test
+
+on:
+  workflow_call:
+    inputs:
+      modulePath:
+        description: "Module path to run python commands"
+        type: string
+        default: ./
+
+jobs:
+  python_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python Setup
+        run: make -C ${{ inputs.modulePath }} setup
+      - name: Python Test
+        run: make -C ${{ inputs.modulePath }} test
+      - name: Python Package
+        run: make -C ${{ inputs.modulePath }} package
