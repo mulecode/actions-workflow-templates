@@ -23,6 +23,10 @@ on:
         description: "The optional chained role to assume"
         required: false
         type: string
+      environment:
+        description: "The terraform environment name, eg.: dev"
+        required: true
+        type: string
 
 jobs:
   terraform_deploy:
@@ -46,8 +50,8 @@ jobs:
           echo "AWS_SECRET_ACCESS_KEY=$(echo $CREDENTIALS | jq -r '.Credentials.SecretAccessKey')" >> $GITHUB_ENV
           echo "AWS_SESSION_TOKEN=$(echo $CREDENTIALS | jq -r '.Credentials.SessionToken')" >> $GITHUB_ENV
       - name: Terraform Init
-        run: make -C ${{ inputs.modulePath }} init
+        run: make -C ${{ inputs.modulePath }} init ENV=${{ inputs.environment }}
       - name: Terraform Plan
-        run: make -C ${{ inputs.modulePath }} plan
+        run: make -C ${{ inputs.modulePath }} plan ENV=${{ inputs.environment }}
       - name: Terraform Apply
         run: make -C ${{ inputs.modulePath }} apply
