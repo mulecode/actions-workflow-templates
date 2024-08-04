@@ -23,6 +23,10 @@ on:
         description: "The optional chained role to assume"
         required: false
         type: string
+      environment:
+        description: "The terraform environment name, eg.: dev"
+        required: true
+        type: string
 
 jobs:
   terraform_test:
@@ -48,8 +52,8 @@ jobs:
       - name: Terraform Format
         run: make -C ${{ inputs.modulePath }} format
       - name: Terraform Init
-        run: make -C ${{ inputs.modulePath }} init
+        run: make -C ${{ inputs.modulePath }} init ENV=${{ inputs.environment }}
       - name: Terraform Validate
         run: make -C ${{ inputs.modulePath }} validate
       - name: Terraform Plan
-        run: make -C ${{ inputs.modulePath }} plan
+        run: make -C ${{ inputs.modulePath }} plan ENV=${{ inputs.environment }}
