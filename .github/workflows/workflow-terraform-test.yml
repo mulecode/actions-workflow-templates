@@ -57,3 +57,11 @@ jobs:
         run: make -C ${{ inputs.modulePath }} validate
       - name: Terraform Plan
         run: make -C ${{ inputs.modulePath }} plan ENV=${{ inputs.environment }}
+
+      - name: Terraform comment
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: terra-plan-{{ github.build_id }}
+          body: |
+            **Edit:** Some additional info
+          reactions: eyes
