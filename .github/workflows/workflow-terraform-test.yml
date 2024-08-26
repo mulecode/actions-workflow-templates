@@ -27,6 +27,18 @@ on:
         description: "The terraform environment name, eg.: dev"
         required: true
         type: string
+      commentTitle:
+        description: "The comment title for summarized terraform plan"
+        required: true
+        type: string
+      issueNumber:
+        description: "The issue or pull request number"
+        required: true
+        type: string
+    secrets:
+      githubToken:
+        description: "GitHub Token for commenting in the PR"
+        required: true
 
 jobs:
   terraform_test:
@@ -57,3 +69,19 @@ jobs:
         run: make -C ${{ inputs.modulePath }} validate
       - name: Terraform Plan
         run: make -C ${{ inputs.modulePath }} plan ENV=${{ inputs.environment }}
+      - name: Terraform Show Plan
+        run: make -C ${{ inputs.modulePath }} show-plan
+
+      - name: Summarize Terraform Plan
+        id: summariseTerraformPlan
+        uses: mulecode/github-action-terraform-plan-summarizer@main
+        with:
+          terraformPlanJson: ${{ inputs.modulePath }}/plan.json
+
+      - name: Create or update comment
+        uses: mulecode/github-action-comment-manager@main
+        with:
+          authToken: ${{ secrets.GITHUB_TOKEN }}
+          issueNumber: ${{ inputs.issueNumber }}
+          commentTitle: ${{ inputs.commentTitle }}
+          commentBodyFile: ${{ steps.summariseTerraformPlan.outputs.summarisedPlan }}
