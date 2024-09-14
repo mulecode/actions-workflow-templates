@@ -27,6 +27,13 @@ on:
         description: "The terraform environment name, eg.: dev"
         required: true
         type: string
+    secrets:
+      COGNITO_USER_POOL_ID:
+        description: "The cognito user pool client id"
+        required: false
+      COGNITO_USER_POOL_CLIENT_ID:
+        description: "The cognito user pool client id"
+        required: false
 
 jobs:
   terraform_deploy:
@@ -50,6 +57,9 @@ jobs:
           echo "AWS_SECRET_ACCESS_KEY=$(echo $CREDENTIALS | jq -r '.Credentials.SecretAccessKey')" >> $GITHUB_ENV
           echo "AWS_SESSION_TOKEN=$(echo $CREDENTIALS | jq -r '.Credentials.SessionToken')" >> $GITHUB_ENV
       - name: Terraform Init
+        env:
+          COGNITO_USER_POOL_ID: ${{ secrets.COGNITO_USER_POOL_ID }}
+          COGNITO_USER_POOL_CLIENT_ID: ${{ secrets.COGNITO_USER_POOL_CLIENT_ID }}
         run: make -C ${{ inputs.modulePath }} init ENV=${{ inputs.environment }}
       - name: Terraform Plan
         run: make -C ${{ inputs.modulePath }} plan ENV=${{ inputs.environment }}
