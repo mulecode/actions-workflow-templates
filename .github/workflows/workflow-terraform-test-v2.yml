@@ -1,0 +1,81 @@
+name: Terraform Test
+
+on:
+  workflow_call:
+    inputs:
+      modulePath:
+        description: "Module path to run terraform commands"
+        type: string
+        default: ./
+      awsRole:
+        description: "The role to assume for the deployment"
+        required: true
+        type: string
+      awsRegion:
+        description: "The region for the deployment"
+        required: true
+        type: string
+      awsSessionName:
+        description: "The session name for the deployment"
+        required: true
+        type: string
+      chainedRole:
+        description: "The optional chained role to assume"
+        required: false
+        type: string
+      environment:
+        description: "The terraform environment name, eg.: dev"
+        required: true
+        type: string
+      commentTitle:
+        description: "The comment title for summarized terraform plan"
+        required: true
+        type: string
+      issueNumber:
+        description: "The issue or pull request number"
+        required: true
+        type: string
+    secrets:
+      githubToken:
+        description: "GitHub Token for commenting in the PR"
+        required: true
+
+jobs:
+  terraform_test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v4.0.2
+        with:
+          role-to-assume: ${{ inputs.awsRole }}
+          role-session-name: ${{ inputs.awsSessionName }}
+          aws-region: ${{ inputs.awsRegion }}
+      - name: Assume chained role
+        if: ${{ inputs.chainedRole != '' }}
+        id: assume-chained-role
+        run: |
+          ROLE_ARN="${{ inputs.chainedRole }}"
+          SESSION_NAME="${{ inputs.awsSessionName }}"
+          CREDENTIALS=$(aws sts assume-role --role-arn $ROLE_ARN --role-session-name $SESSION_NAME)
+          echo "AWS_ACCESS_KEY_ID=$(echo $CREDENTIALS | jq -r '.Credentials.AccessKeyId')" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=$(echo $CREDENTIALS | jq -r '.Credentials.SecretAccessKey')" >> $GITHUB_ENV
+          echo "AWS_SESSION_TOKEN=$(echo $CREDENTIALS | jq -r '.Credentials.SessionToken')" >> $GITHUB_ENV
+      - name: Terraform Format
+        run: make -C ${{ inputs.modulePath }} lint
+      - name: Terraform Init Plan Validate
+        run: make -C ${{ inputs.modulePath }} test ENV=${{ inputs.environment }}
+
+      - name: Summarize Terraform Plan
+        id: summariseTerraformPlan
+        uses: mulecode/github-action-terraform-plan-summarizer@main
+        with:
+          terraformPlanJson: ${{ inputs.modulePath }}/plan.json
+
+      - name: Create or update comment
+        uses: mulecode/github-action-comment-manager@main
+        with:
+          authToken: ${{ secrets.GITHUB_TOKEN }}
+          issueNumber: ${{ inputs.issueNumber }}
+          commentTitle: ${{ inputs.commentTitle }}
+          commentBodyFile: ${{ steps.summariseTerraformPlan.outputs.summarisedPlan }}
