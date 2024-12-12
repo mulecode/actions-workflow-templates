@@ -27,6 +27,14 @@ on:
         description: "The terraform environment name, eg.: dev"
         required: true
         type: string
+      environment_vars:
+        description: "Any environment variables to be passed to the terraform module"
+        required: false
+        type: string
+    secrets:
+      environment_secrets:
+        description: "GitHub secrets o be used in the workflow"
+        required: false
 
 jobs:
   terraform_deploy:
@@ -50,4 +58,4 @@ jobs:
           echo "AWS_SECRET_ACCESS_KEY=$(echo $CREDENTIALS | jq -r '.Credentials.SecretAccessKey')" >> $GITHUB_ENV
           echo "AWS_SESSION_TOKEN=$(echo $CREDENTIALS | jq -r '.Credentials.SessionToken')" >> $GITHUB_ENV
       - name: Terraform Init Plan Apply
-        run: make -C ${{ inputs.modulePath }} deploy ENV=${{ inputs.environment }}
+        run: make -C ${{ inputs.modulePath }} deploy ENV=${{ inputs.envs }} ENV_VARS="${{ inputs.environment_vars }}" ENV_SECRETS="${{ secrets.environment_secrets }}"
