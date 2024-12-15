@@ -58,4 +58,4 @@ jobs:
           echo "AWS_SECRET_ACCESS_KEY=$(echo $CREDENTIALS | jq -r '.Credentials.SecretAccessKey')" >> $GITHUB_ENV
           echo "AWS_SESSION_TOKEN=$(echo $CREDENTIALS | jq -r '.Credentials.SessionToken')" >> $GITHUB_ENV
       - name: Terraform Init Plan Apply
-        run: make -C ${{ inputs.modulePath }} deploy ENV=${{ inputs.envs }} ENV_VARS="${{ inputs.environment_vars }}" ENV_SECRETS="${{ secrets.environment_secrets }}"
+        run: make -C ${{ inputs.modulePath }} deploy ENV=${{ inputs.environment }} ENV_VARS="${{ inputs.environment_vars }}" ENV_SECRETS="${{ secrets.environment_secrets }}"
