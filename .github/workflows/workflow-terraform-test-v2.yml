@@ -69,7 +69,12 @@ jobs:
       - name: Terraform Format
         run: make -C ${{ inputs.modulePath }} lint
       - name: Terraform Init Plan Validate
-        run: make -C ${{ inputs.modulePath }} test ENV=${{ inputs.environment }} ENV_VARS="${{ inputs.environment_vars }}" ENV_SECRETS="${{ secrets.environment_secrets }}"
+        run: | 
+          make -C ${{ inputs.modulePath }} test \ 
+            ENV=${{ inputs.environment }} \
+            TERRAFORM_DIR=${{ inputs.modulePath }} \
+            ENV_VARS="${{ inputs.environment_vars }}" \
+            ENV_SECRETS="${{ secrets.environment_secrets }}"
 
       - name: Summarize Terraform Plan
         id: summariseTerraformPlan
