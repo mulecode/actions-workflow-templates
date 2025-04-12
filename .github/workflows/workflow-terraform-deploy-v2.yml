@@ -47,15 +47,13 @@ jobs:
           role-to-assume: ${{ inputs.awsRole }}
           role-session-name: ${{ inputs.awsSessionName }}
           aws-region: ${{ inputs.awsRegion }}
-      - name: Assume chained role
+      - name: Assuming chained role in ${{ matrix.environment }}
         if: ${{ inputs.chainedRole != '' }}
-        id: assume-chained-role
-        run: |
-          ROLE_ARN="${{ inputs.chainedRole }}"
-          SESSION_NAME="${{ inputs.awsSessionName }}"
-          CREDENTIALS=$(aws sts assume-role --role-arn $ROLE_ARN --role-session-name $SESSION_NAME)
-          echo "AWS_ACCESS_KEY_ID=$(echo $CREDENTIALS | jq -r '.Credentials.AccessKeyId')" >> $GITHUB_ENV
-          echo "AWS_SECRET_ACCESS_KEY=$(echo $CREDENTIALS | jq -r '.Credentials.SecretAccessKey')" >> $GITHUB_ENV
-          echo "AWS_SESSION_TOKEN=$(echo $CREDENTIALS | jq -r '.Credentials.SessionToken')" >> $GITHUB_ENV
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ inputs.awsRegion }}
+          role-to-assume: ${{ inputs.chainedRole }}
+          role-session-name: ${{ inputs.awsSessionName }}
+          role-chaining: true
       - name: Terraform Init Plan Apply
         run: make -C ${{ inputs.modulePath }} deploy ENV=${{ inputs.environment }} ENV_VARS="${{ inputs.environment_vars }}" ENV_SECRETS="${{ secrets.environment_secrets }}"
