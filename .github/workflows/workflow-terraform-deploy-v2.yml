@@ -56,9 +56,6 @@ jobs:
           role-session-name: ${{ inputs.awsSessionName }}
           role-chaining: true
       - name: Terraform Init Plan Apply
-        env:
-          ENV: ${{ inputs.environment }}
-          TERRAFORM_DIR: ${{ inputs.modulePath }}
         run: |
           make -C ${{ inputs.modulePath }} deploy \
             ENV=${{ inputs.environment }} \
