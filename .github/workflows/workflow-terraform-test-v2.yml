@@ -74,6 +74,7 @@ jobs:
         run: make -C ${{ inputs.modulePath }} lint
       - name: Terraform Init Plan Validate
         run: |
+          echo "Terraform Init Plan Validate for ENV ${{ inputs.environment }} TERRAFORM_DIR ${{ inputs.terraformDir }}"
           make -C ${{ inputs.modulePath }} test \ 
             ENV=${{ inputs.environment }} \
             TERRAFORM_DIR=${{ inputs.terraformDir }} \
