@@ -75,7 +75,7 @@ jobs:
       - name: Terraform Init Plan Validate
         run: |
           echo "Terraform Init Plan Validate for ENV ${{ inputs.environment }} TERRAFORM_DIR ${{ inputs.terraformDir }}"
-          make -C ${{ inputs.modulePath }} test ENV=${{ inputs.environment }} TERRAFORM_DIR=${{ inputs.terraformDir }} ENV_VARS="${{ inputs.environment_vars }}" ENV_SECRETS="${{ secrets.environment_secrets }}"
+          make -C ${{ inputs.modulePath }} test ENV="${{ inputs.environment }}" TERRAFORM_DIR="${{ inputs.terraformDir }}" ENV_VARS="${{ inputs.environment_vars }}" ENV_SECRETS="${{ secrets.environment_secrets }}"
       - name: Summarize Terraform Plan
         id: summariseTerraformPlan
         uses: mulecode/github-action-terraform-plan-summarizer@main

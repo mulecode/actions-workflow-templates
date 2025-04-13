@@ -61,4 +61,4 @@ jobs:
           role-chaining: true
       - name: Terraform Init Plan Apply
         run: |
-          make -C ${{ inputs.modulePath }} deploy ENV=${{ inputs.environment }} TERRAFORM_DIR=${{ inputs.terraformDir }} ENV_VARS="${{ inputs.environment_vars }}" ENV_SECRETS="${{ secrets.environment_secrets }}"
+          make -C ${{ inputs.modulePath }} deploy ENV="${{ inputs.environment }}" TERRAFORM_DIR="${{ inputs.terraformDir }}" ENV_VARS="${{ inputs.environment_vars }}" ENV_SECRETS="${{ secrets.environment_secrets }}"
