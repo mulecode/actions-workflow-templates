@@ -69,19 +69,19 @@ jobs:
       - name: Terraform Format
         run: make -C ${{ inputs.modulePath }} lint
       - name: Terraform Init Plan Validate
-        run: | 
+        env:
+          TERRAFORM_DIR: ${{ inputs.modulePath }}
+        run: |
           make -C ${{ inputs.modulePath }} test \ 
             ENV=${{ inputs.environment }} \
             TERRAFORM_DIR=${{ inputs.modulePath }} \
             ENV_VARS="${{ inputs.environment_vars }}" \
             ENV_SECRETS="${{ secrets.environment_secrets }}"
-
       - name: Summarize Terraform Plan
         id: summariseTerraformPlan
         uses: mulecode/github-action-terraform-plan-summarizer@main
         with:
           terraformPlanJson: ${{ inputs.modulePath }}/plan.json
-
       - name: Create or update comment
         uses: mulecode/github-action-comment-manager@main
         with:
