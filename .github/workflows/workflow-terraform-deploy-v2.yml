@@ -7,6 +7,10 @@ on:
         description: "Module path to run terraform commands"
         type: string
         default: ./
+      terraformDir:
+        description: "Module path to run terraform commands"
+        type: string
+        default: /
       awsRole:
         description: "The role to assume for the deployment"
         required: true
@@ -59,6 +63,6 @@ jobs:
         run: |
           make -C ${{ inputs.modulePath }} deploy \
             ENV=${{ inputs.environment }} \
-            TERRAFORM_DIR=${{ inputs.modulePath }} \
+            TERRAFORM_DIR=${{ inputs.terraformDir }} \
             ENV_VARS="${{ inputs.environment_vars }}" \
             ENV_SECRETS="${{ secrets.environment_secrets }}"
