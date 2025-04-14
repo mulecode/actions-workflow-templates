@@ -35,6 +35,30 @@ on:
         description: "Any environment variables to be passed to the terraform module"
         required: false
         type: string
+      artifactName1:
+        description: "Optional download artfact 1"
+        required: false
+        type: string
+      artifactPath1:
+        description: "Optional path for artfact 1"
+        required: false
+        type: string
+      artifactName2:
+        description: "Optional download artfact 2"
+        required: false
+        type: string
+      artifactPath2:
+        description: "Optional path for artfact 2"
+        required: false
+        type: string
+      artifactName3:
+        description: "Optional download artfact 3"
+        required: false
+        type: string
+      artifactPath3:
+        description: "Optional path for artfact 3"
+        required: false
+        type: string
     secrets:
       environment_secrets:
         description: "GitHub secrets o be used in the workflow"
@@ -45,6 +69,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Download artifact1 ${{ inputs.artifactName1 }}
+        if: inputs.artifactName1 != ''
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifactName1 }}
+          path: ${{ inputs.artifactPath1 }}
+      - name: Download artifact2 ${{ inputs.artifactName2 }}
+        if: inputs.artifactName2 != ''
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifactName2 }}
+          path: ${{ inputs.artifactPath2 }}
+      - name: Download artifact3 ${{ inputs.artifactName3 }}
+        if: inputs.artifactName3 != ''
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifactName3 }}
+          path: ${{ inputs.artifactPath3 }}
       - name: configure aws credentials
         uses: aws-actions/configure-aws-credentials@v4.0.2
         with:
