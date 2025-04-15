@@ -31,7 +31,7 @@ on:
         description: "The terraform environment name, eg.: dev"
         required: true
         type: string
-      environment_vars:
+      environmentVars:
         description: "Any environment variables to be passed to the terraform module"
         required: false
         type: string
@@ -60,7 +60,7 @@ on:
         required: false
         type: string
     secrets:
-      environment_secrets:
+      environmentSecrets:
         description: "GitHub secrets o be used in the workflow"
         required: false
 
@@ -103,4 +103,4 @@ jobs:
           role-chaining: true
       - name: Terraform Init Plan Apply
         run: |
-          make -C ${{ inputs.modulePath }} deploy ENV="${{ inputs.environment }}" TERRAFORM_DIR="${{ inputs.terraformDir }}" ENV_VARS="${{ inputs.environment_vars }}" ENV_SECRETS="${{ secrets.environment_secrets }}"
+          make -C ${{ inputs.modulePath }} deploy ENV="${{ inputs.environment }}" TERRAFORM_DIR="${{ inputs.terraformDir }}" ENV_VARS="${{ inputs.environmentVars }}" ENV_SECRETS="${{ secrets.environmentSecrets }}"

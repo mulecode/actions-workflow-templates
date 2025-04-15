@@ -31,7 +31,7 @@ on:
         description: "The terraform environment name, eg.: dev"
         required: true
         type: string
-      environment_vars:
+      environmentVars:
         description: "Any environment variables to be passed to the terraform module"
         required: false
         type: string
@@ -47,7 +47,7 @@ on:
       githubToken:
         description: "GitHub Token for commenting in the PR"
         required: true
-      environment_secrets:
+      environmentSecrets:
         description: "GitHub secrets o be used in the workflow"
         required: false
 
@@ -75,7 +75,7 @@ jobs:
       - name: Terraform Init Plan Validate
         run: |
           echo "Terraform Init Plan Validate for ENV ${{ inputs.environment }} TERRAFORM_DIR ${{ inputs.terraformDir }}"
-          make -C ${{ inputs.modulePath }} test ENV="${{ inputs.environment }}" TERRAFORM_DIR="${{ inputs.terraformDir }}" ENV_VARS="${{ inputs.environment_vars }}" ENV_SECRETS="${{ secrets.environment_secrets }}"
+          make -C ${{ inputs.modulePath }} test ENV="${{ inputs.environment }}" TERRAFORM_DIR="${{ inputs.terraformDir }}" ENV_VARS="${{ inputs.environmentVars }}" ENV_SECRETS="${{ secrets.environmentSecrets }}"
       - name: Summarize Terraform Plan
         id: summariseTerraformPlan
         uses: mulecode/github-action-terraform-plan-summarizer@main
